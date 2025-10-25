@@ -39,7 +39,7 @@ jobs:
 
   deploy-github-pages:
     name: Deploy Frontend to GitHub Pages
-    needs: deploy-convex
+    # needs: deploy-convex
     runs-on: ubuntu-latest
     environment:
       name: github-pages
