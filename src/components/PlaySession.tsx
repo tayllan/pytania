@@ -192,21 +192,34 @@ function MatchQuestion({
   const [shuffledQuestions, setShuffledQuestions] = useState<any[]>([]);
   const [shuffledAnswers, setShuffledAnswers] = useState<any[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState<number | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
   useEffect(() => {
     if (question.matchPairs) {
       const questions = question.matchPairs.map((p: any, i: number) => ({ ...p, originalIndex: i }));
       const answers = [...question.matchPairs].map((p: any, i: number) => ({ ...p, originalIndex: i }));
-      
+
       setShuffledQuestions(questions.sort(() => Math.random() - 0.5));
       setShuffledAnswers(answers.sort(() => Math.random() - 0.5));
     }
   }, [question]);
 
+  // When both a question and answer are selected, create a match
+  useEffect(() => {
+    if (selectedQuestion !== null && selectedAnswer !== null) {
+      const newMatches = { ...matches, [selectedQuestion]: selectedAnswer };
+      setMatches(newMatches);
+      setSelectedQuestion(null);
+      setSelectedAnswer(null);
+    }
+  }, [selectedQuestion, selectedAnswer]);
+
   const handleSubmit = async () => {
+    // Convert shuffled indices to original indices for backend validation
     const matchAnswers = Object.entries(matches).map(([qIdx, aIdx]) => ({
-      questionIndex: Number(qIdx),
-      answerIndex: Number(aIdx),
+      questionIndex: shuffledQuestions[Number(qIdx)].originalIndex,
+      answerIndex: shuffledAnswers[Number(aIdx)].originalIndex,
     }));
 
     await submitAnswer({
@@ -215,7 +228,9 @@ function MatchQuestion({
       matchAnswers,
     });
     setSubmitted(true);
-    toast.success("Answer submitted!");
+    if (!isPracticeMode) {
+      toast.success("Answer submitted!");
+    }
   };
 
   const isCorrect = (qIdx: number) => {
@@ -225,50 +240,138 @@ function MatchQuestion({
     return shuffledQuestions[qIdx].originalIndex === shuffledAnswers[aIdx].originalIndex;
   };
 
+  const isQuestionMatched = (qIdx: number) => matches[qIdx] !== undefined;
+  const isAnswerMatched = (aIdx: number) => Object.values(matches).includes(aIdx);
+
   return (
     <div>
       <h3 className="text-xl font-bold text-emerald-900 mb-4">Match the questions with their answers</h3>
-      
-      <div className="grid grid-cols-2 gap-6">
-        <div className="space-y-3">
-          <h4 className="font-semibold text-emerald-800 mb-2">Questions</h4>
-          {shuffledQuestions.map((item, i) => (
-            <div
-              key={i}
-              className={`p-4 rounded-lg border-2 ${
-                matches[i] !== undefined
-                  ? isCorrect(i) === true
-                    ? "border-green-500 bg-green-50"
-                    : isCorrect(i) === false
-                    ? "border-red-500 bg-red-50"
-                    : "border-emerald-500 bg-emerald-50"
-                  : "border-gray-300 bg-white"
-              }`}
-            >
-              <div className="font-semibold text-emerald-900 mb-2">{String.fromCharCode(65 + i)}.</div>
-              <div className="text-emerald-800">{item.question}</div>
-            </div>
-          ))}
-        </div>
+      {!submitted && <p className="text-emerald-700 mb-4">Click a question, then click its matching answer</p>}
 
-        <div className="space-y-3">
-          <h4 className="font-semibold text-emerald-800 mb-2">Answers</h4>
-          {shuffledAnswers.map((item, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                const qIdx = Object.keys(matches).length % shuffledQuestions.length;
-                setMatches({ ...matches, [qIdx]: i });
-              }}
-              disabled={submitted && isPracticeMode}
-              className="w-full p-4 rounded-lg border-2 border-gray-300 bg-white hover:border-emerald-500 hover:bg-emerald-50 transition-colors text-left disabled:opacity-50"
-            >
-              <div className="font-semibold text-emerald-900 mb-2">{i + 1}.</div>
-              <div className="text-emerald-800">{item.answer}</div>
-            </button>
-          ))}
+      {!submitted || !isPracticeMode ? (
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <h4 className="font-semibold text-emerald-800 mb-2">Questions</h4>
+            {shuffledQuestions.map((item, i) => {
+              const matchedAnswerIdx = matches[i];
+              return (
+                <button
+                  key={i}
+                  onClick={() => {
+                    if (submitted) return;
+                    if (isQuestionMatched(i)) return;
+
+                    // If an answer is selected, create a match
+                    if (selectedAnswer !== null) {
+                      setMatches({ ...matches, [i]: selectedAnswer });
+                      setSelectedQuestion(null);
+                      setSelectedAnswer(null);
+                    } else {
+                      // Otherwise, select this question
+                      setSelectedQuestion(i);
+                    }
+                  }}
+                  disabled={submitted}
+                  className={`w-full p-4 rounded-lg border-2 transition-colors text-left ${
+                    isQuestionMatched(i)
+                      ? "border-emerald-500 bg-emerald-50"
+                      : selectedQuestion === i
+                      ? "border-emerald-600 bg-emerald-100"
+                      : "border-gray-300 bg-white hover:border-emerald-400 hover:bg-emerald-50"
+                  } ${submitted ? "cursor-not-allowed opacity-75" : "cursor-pointer"}`}
+                >
+                  <div className="font-semibold text-emerald-900 mb-2">
+                    {String.fromCharCode(65 + i)}.
+                    {matchedAnswerIdx !== undefined && ` → ${matchedAnswerIdx + 1}`}
+                  </div>
+                  <div className="text-emerald-800">{item.question}</div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="space-y-3">
+            <h4 className="font-semibold text-emerald-800 mb-2">Answers</h4>
+            {shuffledAnswers.map((item, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  if (submitted) return;
+                  if (isAnswerMatched(i)) return;
+
+                  // If a question is selected, create a match
+                  if (selectedQuestion !== null) {
+                    setMatches({ ...matches, [selectedQuestion]: i });
+                    setSelectedQuestion(null);
+                    setSelectedAnswer(null);
+                  } else {
+                    // Otherwise, select this answer
+                    setSelectedAnswer(i);
+                  }
+                }}
+                disabled={submitted}
+                className={`w-full p-4 rounded-lg border-2 transition-colors text-left ${
+                  isAnswerMatched(i)
+                    ? "border-emerald-500 bg-emerald-50"
+                    : selectedAnswer === i
+                    ? "border-emerald-600 bg-emerald-100"
+                    : "border-gray-300 bg-white hover:border-emerald-400 hover:bg-emerald-50"
+                } ${submitted ? "cursor-not-allowed opacity-75" : "cursor-pointer"}`}
+              >
+                <div className="font-semibold text-emerald-900 mb-2">{i + 1}.</div>
+                <div className="text-emerald-800">{item.answer}</div>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="space-y-4">
+          {shuffledQuestions.map((item, i) => {
+            const matchedAnswerIdx = matches[i];
+            const correct = isCorrect(i);
+            const correctAnswerIdx = shuffledAnswers.findIndex(a => a.originalIndex === item.originalIndex);
+
+            return (
+              <div
+                key={i}
+                className={`p-4 rounded-lg border-2 ${
+                  correct
+                    ? "border-green-500 bg-green-50"
+                    : "border-red-500 bg-red-50"
+                }`}
+              >
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="font-semibold text-gray-700 text-sm mb-1">Question {String.fromCharCode(65 + i)}</div>
+                    <div className="text-gray-900">{item.question}</div>
+                  </div>
+                  <div>
+                    {correct ? (
+                      <>
+                        <div className="font-semibold text-green-700 text-sm mb-1 flex items-center gap-2">
+                          <span className="text-green-600">✓</span> Correct Match
+                        </div>
+                        <div className="text-gray-900">{shuffledAnswers[matchedAnswerIdx].answer}</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="font-semibold text-red-700 text-sm mb-1 flex items-center gap-2">
+                          <span className="text-red-600">✗</span> Your Answer (Incorrect)
+                        </div>
+                        <div className="text-red-900 line-through">{shuffledAnswers[matchedAnswerIdx].answer}</div>
+                        <div className="font-semibold text-green-700 text-sm mb-1 mt-3 flex items-center gap-2">
+                          <span className="text-green-600">✓</span> Correct Answer
+                        </div>
+                        <div className="text-green-900 font-medium">{shuffledAnswers[correctAnswerIdx].answer}</div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {!submitted && (
         <button
@@ -300,11 +403,13 @@ function MultipleChoiceQuestion({
       selectedIndices: selected,
     });
     setSubmitted(true);
-    toast.success("Answer submitted!");
+    if (!isPracticeMode) {
+      toast.success("Answer submitted!");
+    }
   };
 
   const toggleChoice = (index: number) => {
-    if (submitted && isPracticeMode) return;
+    if (submitted) return;
     if (selected.includes(index)) {
       setSelected(selected.filter(i => i !== index));
     } else {
@@ -326,7 +431,7 @@ function MultipleChoiceQuestion({
             <button
               key={i}
               onClick={() => toggleChoice(i)}
-              disabled={submitted && isPracticeMode}
+              disabled={submitted}
               className={`w-full p-4 rounded-lg border-2 text-left transition-colors ${
                 showFeedback
                   ? isCorrect
@@ -337,7 +442,7 @@ function MultipleChoiceQuestion({
                   : isSelected
                   ? "border-emerald-600 bg-emerald-50"
                   : "border-gray-300 bg-white hover:border-emerald-400"
-              }`}
+              } ${submitted && !isPracticeMode ? "cursor-not-allowed opacity-75" : ""}`}
             >
               <div className="flex items-center gap-3">
                 <div
@@ -390,21 +495,21 @@ function FreeTextQuestion({
     });
     setSubmitted(true);
 
-    if (isPracticeMode) {
-      setEvaluating(true);
-      try {
-        await evaluateFreeText({
-          answerId,
-          question: question.prompt,
-          answer: text,
-        });
-      } catch (error) {
-        toast.error("Failed to evaluate answer");
+    // Always evaluate free text answers with LLM
+    setEvaluating(true);
+    try {
+      await evaluateFreeText({
+        answerId,
+        question: question.prompt,
+        answer: text,
+      });
+      if (!isPracticeMode) {
+        toast.success("Answer submitted!");
       }
-      setEvaluating(false);
-    } else {
-      toast.success("Answer submitted!");
+    } catch (error) {
+      toast.error("Failed to evaluate answer");
     }
+    setEvaluating(false);
   };
 
   return (
@@ -430,12 +535,18 @@ function FreeTextQuestion({
         </button>
       )}
 
-      {evaluating && (
+      {evaluating && isPracticeMode && (
         <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-center gap-2">
             <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
             <span className="text-blue-800">Evaluating your answer...</span>
           </div>
+        </div>
+      )}
+
+      {submitted && !isPracticeMode && !evaluating && (
+        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="text-blue-900">✓ Answer submitted. Feedback will be available after completing the exam.</div>
         </div>
       )}
 
@@ -501,9 +612,17 @@ function Results({ questions, answers, onEnd }: any) {
                   {answer?.isCorrect === true && <span className="ml-auto text-green-600 font-semibold">✓ Correct</span>}
                   {answer?.isCorrect === false && <span className="ml-auto text-red-600 font-semibold">✗ Incorrect</span>}
                 </div>
-                
+
+                {question.type === "free_text" && answer?.textAnswer && (
+                  <div className="mt-2 text-sm text-emerald-900">
+                    <div className="font-semibold mb-1">Your answer:</div>
+                    <div className="text-emerald-800">{answer.textAnswer}</div>
+                  </div>
+                )}
+
                 {question.type === "free_text" && answer?.llmFeedback && (
                   <div className="mt-2 text-sm text-emerald-800 italic">
+                    <div className="font-semibold mb-1">Feedback:</div>
                     {answer.llmFeedback}
                   </div>
                 )}

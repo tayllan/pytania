@@ -22,6 +22,7 @@ export default function App() {
   const handleBackToDecks = () => {
     setCurrentView("decks");
     setSelectedDeckId(null);
+    setSessionId(null);
   };
 
   const handleStartPlay = (sessionId: Id<"sessions">) => {
@@ -37,10 +38,13 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
       <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-md h-16 flex justify-between items-center border-b border-emerald-200 shadow-sm px-6">
-        <div className="flex items-center gap-3">
+        <button
+          onClick={handleBackToDecks}
+          className="flex items-center gap-3 hover:opacity-70 transition-opacity cursor-pointer"
+        >
           <div className="text-2xl">🩺</div>
           <h2 className="text-xl font-bold text-emerald-800">VetStudy</h2>
-        </div>
+        </button>
         <SignOutButton />
       </header>
       <main className="flex-1 p-6">
@@ -54,7 +58,7 @@ export default function App() {
           onEndPlay={handleEndPlay}
         />
       </main>
-      <Toaster />
+      <Toaster position="top-right" />
     </div>
   );
 }
