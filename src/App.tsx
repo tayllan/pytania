@@ -36,14 +36,14 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
-      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-md h-16 flex justify-between items-center border-b border-orange-200 shadow-sm px-6">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
+      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-md h-16 flex justify-between items-center border-b border-emerald-200 shadow-sm px-6">
         <button
           onClick={handleBackToDecks}
           className="flex items-center gap-3 hover:opacity-70 transition-opacity cursor-pointer"
         >
-          <img src="/src/logo.png" alt="Pytania" className="w-8 h-8" />
-          <h2 className="text-xl font-bold text-orange-800">Pytania</h2>
+          <div className="text-2xl">🩺</div>
+          <h2 className="text-xl font-bold text-emerald-800">VetStudy</h2>
         </button>
         <SignOutButton />
       </header>
@@ -85,7 +85,7 @@ function Content({
   if (loggedInUser === undefined) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent"></div>
       </div>
     );
   }
@@ -113,10 +113,10 @@ function Content({
       <Unauthenticated>
         <div className="max-w-md mx-auto mt-20">
           <div className="text-center mb-8">
-            <img src="/src/logo.png" alt="Pytania" className="w-24 h-24 mx-auto mb-4" />
-            <h1 className="text-4xl font-bold text-orange-800 mb-2">Pytania</h1>
-            <p className="text-lg text-orange-700">
-              Domine a medicina veterinária com decks de estudo interativos
+            <div className="text-6xl mb-4">🩺</div>
+            <h1 className="text-4xl font-bold text-emerald-800 mb-2">VetStudy</h1>
+            <p className="text-lg text-emerald-700">
+              Master veterinary medicine with interactive study decks
             </p>
           </div>
           <SignInForm />
