@@ -69,6 +69,30 @@ export const create = mutation({
   },
 });
 
+export const update = mutation({
+  args: {
+    deckId: v.id("decks"),
+    name: v.string(),
+    description: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    const deck = await ctx.db.get(args.deckId);
+    if (!deck || deck.userId !== userId) {
+      throw new Error("Deck not found");
+    }
+
+    await ctx.db.patch(args.deckId, {
+      name: args.name,
+      description: args.description,
+    });
+  },
+});
+
 export const remove = mutation({
   args: { deckId: v.id("decks") },
   handler: async (ctx, args) => {
@@ -76,22 +100,22 @@ export const remove = mutation({
     if (!userId) {
       throw new Error("Not authenticated");
     }
-    
+
     const deck = await ctx.db.get(args.deckId);
     if (!deck || deck.userId !== userId) {
       throw new Error("Deck not found");
     }
-    
+
     // Delete all questions in the deck
     const questions = await ctx.db
       .query("questions")
       .withIndex("by_deck", (q) => q.eq("deckId", args.deckId))
       .collect();
-    
+
     for (const question of questions) {
       await ctx.db.delete(question._id);
     }
-    
+
     await ctx.db.delete(args.deckId);
   },
 });

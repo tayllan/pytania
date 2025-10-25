@@ -325,7 +325,7 @@ function MatchQuestion({
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-2">
           {shuffledQuestions.map((item, i) => {
             const matchedAnswerIdx = matches[i];
             const correct = isCorrect(i);
@@ -334,36 +334,29 @@ function MatchQuestion({
             return (
               <div
                 key={i}
-                className={`p-4 rounded-lg border-2 ${
+                className={`p-3 rounded-lg border-l-4 ${
                   correct
                     ? "border-green-500 bg-green-50"
                     : "border-red-500 bg-red-50"
                 }`}
               >
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="font-semibold text-gray-700 text-sm mb-1">Question {String.fromCharCode(65 + i)}</div>
-                    <div className="text-gray-900">{item.question}</div>
-                  </div>
-                  <div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center font-bold text-sm">
                     {correct ? (
-                      <>
-                        <div className="font-semibold text-green-700 text-sm mb-1 flex items-center gap-2">
-                          <span className="text-green-600">✓</span> Correct Match
-                        </div>
-                        <div className="text-gray-900">{shuffledAnswers[matchedAnswerIdx].answer}</div>
-                      </>
+                      <span className="text-green-600">✓</span>
                     ) : (
-                      <>
-                        <div className="font-semibold text-red-700 text-sm mb-1 flex items-center gap-2">
-                          <span className="text-red-600">✗</span> Your Answer (Incorrect)
-                        </div>
-                        <div className="text-red-900 line-through">{shuffledAnswers[matchedAnswerIdx].answer}</div>
-                        <div className="font-semibold text-green-700 text-sm mb-1 mt-3 flex items-center gap-2">
-                          <span className="text-green-600">✓</span> Correct Answer
-                        </div>
-                        <div className="text-green-900 font-medium">{shuffledAnswers[correctAnswerIdx].answer}</div>
-                      </>
+                      <span className="text-red-600">✗</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-gray-900 mb-1">{item.question}</div>
+                    {correct ? (
+                      <div className="text-sm text-green-700">→ {shuffledAnswers[matchedAnswerIdx].answer}</div>
+                    ) : (
+                      <div className="text-xs space-y-1">
+                        <div className="text-red-700">Your answer: {shuffledAnswers[matchedAnswerIdx].answer}</div>
+                        <div className="text-green-700">Correct: {shuffledAnswers[correctAnswerIdx].answer}</div>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -561,15 +554,26 @@ function FreeTextQuestion({
 }
 
 function Results({ questions, answers, onEnd }: any) {
+  const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set());
   const answeredQuestions = answers.length;
   const correctAnswers = answers.filter((a: any) => a.isCorrect === true).length;
   const percentage = answeredQuestions > 0 ? Math.round((correctAnswers / questions.length) * 100) : 0;
+
+  const toggleQuestion = (questionId: string) => {
+    const newExpanded = new Set(expandedQuestions);
+    if (newExpanded.has(questionId)) {
+      newExpanded.delete(questionId);
+    } else {
+      newExpanded.add(questionId);
+    }
+    setExpandedQuestions(newExpanded);
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-xl p-8 shadow-lg border border-emerald-100 mb-6">
         <h2 className="text-3xl font-bold text-emerald-900 mb-6 text-center">Session Complete!</h2>
-        
+
         <div className="grid grid-cols-3 gap-6 mb-8">
           <div className="text-center p-6 bg-emerald-50 rounded-lg">
             <div className="text-4xl font-bold text-emerald-700">{answeredQuestions}</div>
@@ -585,13 +589,15 @@ function Results({ questions, answers, onEnd }: any) {
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {questions.map((question: any, i: number) => {
             const answer = answers.find((a: any) => a.questionId === question._id);
+            const isExpanded = expandedQuestions.has(question._id);
+
             return (
               <div
                 key={question._id}
-                className={`p-4 rounded-lg border-2 ${
+                className={`rounded-lg border-2 overflow-hidden transition-all ${
                   !answer
                     ? "border-gray-300 bg-gray-50"
                     : answer.isCorrect === true
@@ -601,29 +607,88 @@ function Results({ questions, answers, onEnd }: any) {
                     : "border-blue-500 bg-blue-50"
                 }`}
               >
-                <div className="flex items-center gap-3 mb-2">
+                <button
+                  onClick={() => toggleQuestion(question._id)}
+                  className="w-full p-4 flex items-center gap-3 text-left hover:opacity-80 transition-opacity"
+                >
                   <span className="font-bold text-emerald-900">#{i + 1}</span>
-                  <span className="px-2 py-1 bg-white rounded text-sm font-semibold">
+                  <span className="px-2 py-1 bg-white rounded text-xs font-semibold">
                     {question.type === "match" && "Match"}
-                    {question.type === "multiple_choice" && "Multiple Choice"}
-                    {question.type === "free_text" && "Free Text"}
+                    {question.type === "multiple_choice" && "MC"}
+                    {question.type === "free_text" && "Free"}
                   </span>
-                  {!answer && <span className="ml-auto text-gray-600">Not answered</span>}
-                  {answer?.isCorrect === true && <span className="ml-auto text-green-600 font-semibold">✓ Correct</span>}
-                  {answer?.isCorrect === false && <span className="ml-auto text-red-600 font-semibold">✗ Incorrect</span>}
-                </div>
+                  {!answer && <span className="ml-auto text-gray-600 text-sm">Not answered</span>}
+                  {answer?.isCorrect === true && <span className="ml-auto text-green-600 font-semibold text-sm">✓ Correct</span>}
+                  {answer?.isCorrect === false && <span className="ml-auto text-red-600 font-semibold text-sm">✗ Incorrect</span>}
+                  <span className="text-emerald-600 text-xl ml-2">{isExpanded ? "−" : "+"}</span>
+                </button>
 
-                {question.type === "free_text" && answer?.textAnswer && (
-                  <div className="mt-2 text-sm text-emerald-900">
-                    <div className="font-semibold mb-1">Your answer:</div>
-                    <div className="text-emerald-800">{answer.textAnswer}</div>
-                  </div>
-                )}
+                {isExpanded && (
+                  <div className="px-4 pb-4 border-t border-emerald-200/50">
+                    {/* Match Question Details */}
+                    {question.type === "match" && (
+                      <div className="space-y-2 mt-3">
+                        <div className="text-sm font-semibold text-emerald-900 mb-2">Correct Pairs:</div>
+                        {question.matchPairs?.map((pair: any, idx: number) => (
+                          <div key={idx} className="text-sm flex gap-2 items-start">
+                            <span className="text-emerald-900">{pair.question}</span>
+                            <span className="text-emerald-500">→</span>
+                            <span className="text-emerald-700 font-medium">{pair.answer}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
-                {question.type === "free_text" && answer?.llmFeedback && (
-                  <div className="mt-2 text-sm text-emerald-800 italic">
-                    <div className="font-semibold mb-1">Feedback:</div>
-                    {answer.llmFeedback}
+                    {/* Multiple Choice Details */}
+                    {question.type === "multiple_choice" && (
+                      <div className="mt-3">
+                        <div className="text-sm font-semibold text-emerald-900 mb-2">{question.question}</div>
+                        <div className="space-y-1">
+                          {question.choices?.map((choice: string, idx: number) => {
+                            const isCorrect = question.correctIndices?.includes(idx);
+                            const wasSelected = answer?.selectedIndices?.includes(idx);
+
+                            return (
+                              <div
+                                key={idx}
+                                className={`text-sm p-2 rounded ${
+                                  isCorrect
+                                    ? "bg-green-100 text-green-900 font-medium"
+                                    : wasSelected
+                                    ? "bg-red-100 text-red-900"
+                                    : "text-gray-600"
+                                }`}
+                              >
+                                <span className="mr-2">{isCorrect ? "✓" : wasSelected ? "✗" : "○"}</span>
+                                {choice}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Free Text Details */}
+                    {question.type === "free_text" && (
+                      <div className="mt-3 space-y-3">
+                        <div>
+                          <div className="text-sm font-semibold text-emerald-900 mb-1">Question:</div>
+                          <div className="text-sm text-emerald-800">{question.prompt}</div>
+                        </div>
+                        {answer?.textAnswer && (
+                          <div>
+                            <div className="text-sm font-semibold text-emerald-900 mb-1">Your answer:</div>
+                            <div className="text-sm text-emerald-800">{answer.textAnswer}</div>
+                          </div>
+                        )}
+                        {answer?.llmFeedback && (
+                          <div>
+                            <div className="text-sm font-semibold text-emerald-900 mb-1">Feedback:</div>
+                            <div className="text-sm text-emerald-800 italic">{answer.llmFeedback}</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
