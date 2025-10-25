@@ -15,12 +15,12 @@ export const create = mutation({
     if (!userId) {
       throw new Error("Not authenticated");
     }
-    
+
     const deck = await ctx.db.get(args.deckId);
     if (!deck || deck.userId !== userId) {
       throw new Error("Deck not found");
     }
-    
+
     return await ctx.db.insert("sessions", {
       deckId: args.deckId,
       userId,
@@ -39,12 +39,12 @@ export const get = query({
     if (!userId) {
       return null;
     }
-    
+
     const session = await ctx.db.get(args.sessionId);
     if (!session || session.userId !== userId) {
       return null;
     }
-    
+
     return session;
   },
 });
@@ -56,12 +56,12 @@ export const complete = mutation({
     if (!userId) {
       throw new Error("Not authenticated");
     }
-    
+
     const session = await ctx.db.get(args.sessionId);
     if (!session || session.userId !== userId) {
       throw new Error("Session not found");
     }
-    
+
     await ctx.db.patch(args.sessionId, {
       completed: true,
       endTime: Date.now(),
@@ -85,26 +85,26 @@ export const submitAnswer = mutation({
     if (!userId) {
       throw new Error("Not authenticated");
     }
-    
+
     const session = await ctx.db.get(args.sessionId);
     if (!session || session.userId !== userId) {
       throw new Error("Session not found");
     }
-    
+
     const question = await ctx.db.get(args.questionId);
     if (!question) {
       throw new Error("Question not found");
     }
-    
+
     // Check if answer already exists
     const existingAnswer = await ctx.db
       .query("answers")
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
       .filter((q) => q.eq(q.field("questionId"), args.questionId))
       .first();
-    
+
     let isCorrect: boolean | undefined = undefined;
-    
+
     // Calculate correctness for match and multiple choice
     if (question.type === "match" && args.matchAnswers) {
       isCorrect = args.matchAnswers.every((answer) => {
@@ -118,7 +118,7 @@ export const submitAnswer = mutation({
       isCorrect = correctSet.size === selectedSet.size &&
         [...correctSet].every((i) => selectedSet.has(i));
     }
-    
+
     if (existingAnswer) {
       await ctx.db.patch(existingAnswer._id, {
         matchAnswers: args.matchAnswers,
@@ -149,12 +149,12 @@ export const getAnswers = query({
     if (!userId) {
       return [];
     }
-    
+
     const session = await ctx.db.get(args.sessionId);
     if (!session || session.userId !== userId) {
       return [];
     }
-    
+
     return await ctx.db
       .query("answers")
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
@@ -173,28 +173,44 @@ export const evaluateFreeText = action({
       baseURL: process.env.CONVEX_OPENAI_BASE_URL,
       apiKey: process.env.CONVEX_OPENAI_API_KEY,
     });
-    
+
+    // Get system message from env or use default
+    const systemMessage =
+      process.env.CONVEX_LLM_SYSTEM_MESSAGE ||
+      "You are an expert veterinary medicine professor evaluating student answers. Provide constructive feedback on the student's answer, noting what they got right and what could be improved. Be encouraging but accurate. Keep your response concise (2-3 sentences).";
+
+    // Get user message template from env or use default
+    // Template should contain {question} and {answer} placeholders
+    const userMessageTemplate =
+      process.env.CONVEX_LLM_USER_MESSAGE_TEMPLATE ||
+      "Question: {question}\n\nStudent Answer: {answer}\n\nProvide feedback on this answer.";
+
+    // Replace placeholders in user message template
+    const userMessage = userMessageTemplate
+      .replace("{question}", args.question)
+      .replace("{answer}", args.answer);
+
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
-          content: "You are an expert veterinary medicine professor evaluating student answers. Provide constructive feedback on the student's answer, noting what they got right and what could be improved. Be encouraging but accurate. Keep your response concise (2-3 sentences).",
+          content: systemMessage,
         },
         {
           role: "user",
-          content: `Question: ${args.question}\n\nStudent Answer: ${args.answer}\n\nProvide feedback on this answer.`,
+          content: userMessage,
         },
       ],
     });
-    
+
     const feedback = response.choices[0].message.content || "Unable to evaluate answer.";
-    
+
     await ctx.runMutation(internal.sessions.updateFeedback, {
       answerId: args.answerId,
       feedback,
     });
-    
+
     return feedback;
   },
 });
