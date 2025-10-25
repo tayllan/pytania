@@ -33,23 +33,23 @@ export function DeckView({
       setShowPlayModal(false);
       onStartPlay(sessionId);
     } catch (error) {
-      toast.error("Failed to start session");
+      toast.error("Falha ao iniciar sessão");
     }
   };
 
   const handleDeleteQuestion = async (questionId: Id<"questions">) => {
-    if (confirm("Delete this question?")) {
+    if (confirm("Deletar esta questão?")) {
       try {
         await removeQuestion({ questionId });
-        toast.success("Question deleted");
+        toast.success("Questão deletada");
       } catch (error) {
-        toast.error("Failed to delete question");
+        toast.error("Falha ao deletar questão");
       }
     }
   };
 
   if (!deck) {
-    return <div>Loading...</div>;
+    return <div>Carregando...</div>;
   }
 
   return (
@@ -58,7 +58,7 @@ export function DeckView({
         onClick={onBack}
         className="mb-6 text-emerald-700 hover:text-emerald-900 font-semibold flex items-center gap-2"
       >
-        ← Back to Decks
+        ← Voltar aos Decks
       </button>
 
       <div className="bg-white rounded-xl p-8 shadow-lg border border-emerald-100 mb-6">
@@ -69,7 +69,7 @@ export function DeckView({
               <button
                 onClick={() => setShowEditDeck(true)}
                 className="text-emerald-600 hover:text-emerald-800 text-sm"
-                title="Edit deck"
+                title="Editar deck"
               >
                 ✎
               </button>
@@ -83,20 +83,20 @@ export function DeckView({
               onClick={() => setShowAddQuestion(true)}
               className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
             >
-              + Add Question
+              + Adicionar Questão
             </button>
             {questions && questions.length > 0 && (
               <button
                 onClick={() => setShowPlayModal(true)}
                 className="px-6 py-3 bg-cyan-600 text-white rounded-lg font-semibold hover:bg-cyan-700 transition-colors"
               >
-                ▶ Play Deck
+                ▶ Jogar Deck
               </button>
             )}
           </div>
         </div>
         <div className="text-emerald-600 font-semibold">
-          {questions?.length || 0} questions
+          {questions?.length || 0} questões
         </div>
       </div>
 
@@ -138,23 +138,23 @@ export function DeckView({
               <div className="flex items-center gap-2">
                 <span className="text-emerald-700 font-bold text-sm">#{index + 1}</span>
                 <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded text-xs font-semibold">
-                  {question.type === "match" && "Match"}
-                  {question.type === "multiple_choice" && "MC"}
-                  {question.type === "free_text" && "Free"}
+                  {question.type === "match" && "Relacionar"}
+                  {question.type === "multiple_choice" && "ME"}
+                  {question.type === "free_text" && "Livre"}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setEditingQuestion(question)}
                   className="text-emerald-500 hover:text-emerald-700 text-sm"
-                  title="Edit question"
+                  title="Editar questão"
                 >
                   ✎
                 </button>
                 <button
                   onClick={() => handleDeleteQuestion(question._id)}
                   className="text-red-400 hover:text-red-600 text-lg leading-none"
-                  title="Delete question"
+                  title="Deletar questão"
                 >
                   ×
                 </button>
@@ -172,7 +172,7 @@ export function DeckView({
                 ))}
                 {question.matchPairs && question.matchPairs.length > 2 && (
                   <div className="text-emerald-500 italic text-[10px]">
-                    +{question.matchPairs.length - 2} more pairs
+                    +{question.matchPairs.length - 2} mais pares
                   </div>
                 )}
               </div>
@@ -209,13 +209,13 @@ export function DeckView({
       {questions?.length === 0 && (
         <div className="text-center py-20 bg-white rounded-xl">
           <div className="text-6xl mb-4">❓</div>
-          <h3 className="text-2xl font-bold text-emerald-900 mb-2">No questions yet</h3>
-          <p className="text-emerald-700 mb-6">Add your first question to start studying</p>
+          <h3 className="text-2xl font-bold text-emerald-900 mb-2">Nenhuma questão ainda</h3>
+          <p className="text-emerald-700 mb-6">Adicione sua primeira questão para começar a estudar</p>
           <button
             onClick={() => setShowAddQuestion(true)}
             className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
           >
-            Add First Question
+            Adicionar Primeira Questão
           </button>
         </div>
       )}
@@ -236,7 +236,7 @@ function PlayModeModal({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl p-8 max-w-md w-full shadow-2xl">
-        <h2 className="text-2xl font-bold text-emerald-900 mb-6">Choose Play Mode</h2>
+        <h2 className="text-2xl font-bold text-emerald-900 mb-6">Escolha o Modo de Jogo</h2>
 
         <div className="space-y-4 mb-6">
           <button
@@ -247,9 +247,9 @@ function PlayModeModal({
                 : "border-gray-200 hover:border-emerald-300"
             }`}
           >
-            <div className="font-bold text-emerald-900 mb-1">Practice Mode</div>
+            <div className="font-bold text-emerald-900 mb-1">Modo Prática</div>
             <div className="text-sm text-emerald-700">
-              No timer • Immediate feedback • Learn as you go
+              Sem cronômetro • Feedback imediato • Aprenda enquanto avança
             </div>
           </button>
 
@@ -261,9 +261,9 @@ function PlayModeModal({
                 : "border-gray-200 hover:border-emerald-300"
             }`}
           >
-            <div className="font-bold text-emerald-900 mb-1">Exam Mode</div>
+            <div className="font-bold text-emerald-900 mb-1">Modo Exame</div>
             <div className="text-sm text-emerald-700">
-              Timed • Results at end • Test your knowledge
+              Com cronômetro • Resultados ao final • Teste seu conhecimento
             </div>
           </button>
         </div>
@@ -271,7 +271,7 @@ function PlayModeModal({
         {mode === "exam" && (
           <div className="mb-6">
             <label className="block text-sm font-medium text-emerald-800 mb-2">
-              Time Limit (minutes)
+              Limite de Tempo (minutos)
             </label>
             <input
               type="number"
@@ -289,13 +289,13 @@ function PlayModeModal({
             onClick={() => onStart(mode, mode === "exam" ? timeLimit * 60 : undefined)}
             className="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
           >
-            Start
+            Iniciar
           </button>
           <button
             onClick={onClose}
             className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
           >
-            Cancel
+            Cancelar
           </button>
         </div>
       </div>
@@ -316,43 +316,43 @@ function EditDeckModal({ deck, onClose }: { deck: any; onClose: () => void }) {
         name,
         description: description || undefined,
       });
-      toast.success("Deck updated!");
+      toast.success("Deck atualizado!");
       onClose();
     } catch (error) {
-      toast.error("Failed to update deck");
+      toast.error("Falha ao atualizar deck");
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-xl p-8 max-w-md w-full shadow-2xl">
-        <h2 className="text-2xl font-bold text-emerald-900 mb-6">Edit Deck</h2>
+        <h2 className="text-2xl font-bold text-emerald-900 mb-6">Editar Deck</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-emerald-800 mb-1">
-              Deck Name
+              Nome do Deck
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full px-4 py-2 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-              placeholder="Enter deck name..."
+              placeholder="Digite o nome do deck..."
               required
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-emerald-800 mb-1">
-              Description (optional)
+              Descrição (opcional)
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full px-4 py-2 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
               rows={3}
-              placeholder="Enter description..."
+              placeholder="Digite a descrição..."
             />
           </div>
 
@@ -361,14 +361,14 @@ function EditDeckModal({ deck, onClose }: { deck: any; onClose: () => void }) {
               type="submit"
               className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
             >
-              Save Changes
+              Salvar Alterações
             </button>
             <button
               type="button"
               onClick={onClose}
               className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
             >
-              Cancel
+              Cancelar
             </button>
           </div>
         </form>
@@ -408,18 +408,18 @@ function AddQuestionModal({
       if (questionType === "match") {
         const validPairs = pairs.filter(p => p.question.trim() && p.answer.trim());
         if (validPairs.length < 2) {
-          toast.error("Add at least 2 complete pairs");
+          toast.error("Adicione pelo menos 2 pares completos");
           return;
         }
         await createMatch({ deckId, pairs: validPairs });
       } else if (questionType === "multiple_choice") {
         const validChoices = choices.filter(c => c.trim());
         if (!mcQuestion.trim() || validChoices.length < 2) {
-          toast.error("Add question and at least 2 choices");
+          toast.error("Adicione a questão e pelo menos 2 opções");
           return;
         }
         if (correctIndices.length === 0) {
-          toast.error("Mark at least one correct answer");
+          toast.error("Marque pelo menos uma resposta correta");
           return;
         }
         await createMultipleChoice({
@@ -430,23 +430,23 @@ function AddQuestionModal({
         });
       } else {
         if (!prompt.trim()) {
-          toast.error("Add a question prompt");
+          toast.error("Adicione um enunciado de questão");
           return;
         }
         await createFreeText({ deckId, prompt });
       }
 
-      toast.success("Question added!");
+      toast.success("Questão adicionada!");
       onClose();
     } catch (error) {
-      toast.error("Failed to add question");
+      toast.error("Falha ao adicionar questão");
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div className="bg-white rounded-xl p-6 max-w-2xl w-full shadow-2xl my-8">
-        <h2 className="text-2xl font-bold text-emerald-900 mb-4">Add Question</h2>
+        <h2 className="text-2xl font-bold text-emerald-900 mb-4">Adicionar Questão</h2>
 
         <div className="flex gap-2 mb-6">
           <button
@@ -457,7 +457,7 @@ function AddQuestionModal({
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
           >
-            Multiple Choice
+            Múltipla Escolha
           </button>
           <button
             onClick={() => setQuestionType("match")}
@@ -467,7 +467,7 @@ function AddQuestionModal({
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
           >
-            Match Q&A
+            Relacionar P&R
           </button>
           <button
             onClick={() => setQuestionType("free_text")}
@@ -477,7 +477,7 @@ function AddQuestionModal({
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
           >
-            Free Text
+            Texto Livre
           </button>
         </div>
 
@@ -494,7 +494,7 @@ function AddQuestionModal({
                       newPairs[i].question = e.target.value;
                       setPairs(newPairs);
                     }}
-                    placeholder="Question"
+                    placeholder="Questão"
                     className="flex-1 px-4 py-2 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   />
                   <input
@@ -505,7 +505,7 @@ function AddQuestionModal({
                       newPairs[i].answer = e.target.value;
                       setPairs(newPairs);
                     }}
-                    placeholder="Answer"
+                    placeholder="Resposta"
                     className="flex-1 px-4 py-2 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   />
                   {pairs.length > 1 && (
@@ -524,7 +524,7 @@ function AddQuestionModal({
                 onClick={() => setPairs([...pairs, { question: "", answer: "" }])}
                 className="text-emerald-600 hover:text-emerald-700 font-semibold"
               >
-                + Add Pair
+                + Adicionar Par
               </button>
             </div>
           )}
@@ -533,19 +533,19 @@ function AddQuestionModal({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-emerald-800 mb-1">
-                  Question
+                  Questão
                 </label>
                 <textarea
                   value={mcQuestion}
                   onChange={(e) => setMcQuestion(e.target.value)}
                   className="w-full px-4 py-2 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   rows={2}
-                  placeholder="Enter your question..."
+                  placeholder="Digite sua questão..."
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-emerald-800 mb-2">
-                  Choices (check correct answers)
+                  Opções (marque as respostas corretas)
                 </label>
                 {choices.map((choice, i) => (
                   <div key={i} className="flex gap-2 mb-2">
@@ -569,7 +569,7 @@ function AddQuestionModal({
                         newChoices[i] = e.target.value;
                         setChoices(newChoices);
                       }}
-                      placeholder={`Choice ${i + 1}`}
+                      placeholder={`Opção ${i + 1}`}
                       className="flex-1 px-4 py-2 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                     />
                     {choices.length > 2 && (
@@ -591,7 +591,7 @@ function AddQuestionModal({
                   onClick={() => setChoices([...choices, ""])}
                   className="text-emerald-600 hover:text-emerald-700 font-semibold text-sm"
                 >
-                  + Add Choice
+                  + Adicionar Opção
                 </button>
               </div>
             </div>
@@ -600,17 +600,17 @@ function AddQuestionModal({
           {questionType === "free_text" && (
             <div>
               <label className="block text-sm font-medium text-emerald-800 mb-1">
-                Question Prompt
+                Enunciado da Questão
               </label>
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 className="w-full px-4 py-2 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                 rows={4}
-                placeholder="Enter your question prompt..."
+                placeholder="Digite o enunciado da sua questão..."
               />
               <p className="text-sm text-emerald-600 mt-1">
-                Student answers will be evaluated by AI
+                As respostas dos alunos serão avaliadas por IA
               </p>
             </div>
           )}
@@ -620,14 +620,14 @@ function AddQuestionModal({
               type="submit"
               className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
             >
-              Add Question
+              Adicionar Questão
             </button>
             <button
               type="button"
               onClick={onClose}
               className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
             >
-              Cancel
+              Cancelar
             </button>
           </div>
         </form>
@@ -659,18 +659,18 @@ function EditQuestionModal({ question, onClose }: { question: any; onClose: () =
       if (question.type === "match") {
         const validPairs = pairs.filter(p => p.question.trim() && p.answer.trim());
         if (validPairs.length < 2) {
-          toast.error("Add at least 2 complete pairs");
+          toast.error("Adicione pelo menos 2 pares completos");
           return;
         }
         await updateMatch({ questionId: question._id, pairs: validPairs });
       } else if (question.type === "multiple_choice") {
         const validChoices = choices.filter(c => c.trim());
         if (!mcQuestion.trim() || validChoices.length < 2) {
-          toast.error("Add question and at least 2 choices");
+          toast.error("Adicione a questão e pelo menos 2 opções");
           return;
         }
         if (correctIndices.length === 0) {
-          toast.error("Mark at least one correct answer");
+          toast.error("Marque pelo menos uma resposta correta");
           return;
         }
         await updateMultipleChoice({
@@ -681,29 +681,29 @@ function EditQuestionModal({ question, onClose }: { question: any; onClose: () =
         });
       } else {
         if (!prompt.trim()) {
-          toast.error("Add a question prompt");
+          toast.error("Adicione um enunciado de questão");
           return;
         }
         await updateFreeText({ questionId: question._id, prompt });
       }
 
-      toast.success("Question updated!");
+      toast.success("Questão atualizada!");
       onClose();
     } catch (error) {
-      toast.error("Failed to update question");
+      toast.error("Falha ao atualizar questão");
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div className="bg-white rounded-xl p-6 max-w-2xl w-full shadow-2xl my-8">
-        <h2 className="text-2xl font-bold text-emerald-900 mb-4">Edit Question</h2>
+        <h2 className="text-2xl font-bold text-emerald-900 mb-4">Editar Questão</h2>
 
         <div className="mb-4 px-3 py-2 bg-emerald-50 rounded-lg text-sm text-emerald-800">
-          Type: <span className="font-semibold">
-            {question.type === "match" && "Match Q&A"}
-            {question.type === "multiple_choice" && "Multiple Choice"}
-            {question.type === "free_text" && "Free Text"}
+          Tipo: <span className="font-semibold">
+            {question.type === "match" && "Relacionar P&R"}
+            {question.type === "multiple_choice" && "Múltipla Escolha"}
+            {question.type === "free_text" && "Texto Livre"}
           </span>
         </div>
 
@@ -720,7 +720,7 @@ function EditQuestionModal({ question, onClose }: { question: any; onClose: () =
                       newPairs[i].question = e.target.value;
                       setPairs(newPairs);
                     }}
-                    placeholder="Question"
+                    placeholder="Questão"
                     className="flex-1 px-4 py-2 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   />
                   <input
@@ -731,7 +731,7 @@ function EditQuestionModal({ question, onClose }: { question: any; onClose: () =
                       newPairs[i].answer = e.target.value;
                       setPairs(newPairs);
                     }}
-                    placeholder="Answer"
+                    placeholder="Resposta"
                     className="flex-1 px-4 py-2 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   />
                   {pairs.length > 1 && (
@@ -750,7 +750,7 @@ function EditQuestionModal({ question, onClose }: { question: any; onClose: () =
                 onClick={() => setPairs([...pairs, { question: "", answer: "" }])}
                 className="text-emerald-600 hover:text-emerald-700 font-semibold"
               >
-                + Add Pair
+                + Adicionar Par
               </button>
             </div>
           )}
@@ -759,19 +759,19 @@ function EditQuestionModal({ question, onClose }: { question: any; onClose: () =
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-emerald-800 mb-1">
-                  Question
+                  Questão
                 </label>
                 <textarea
                   value={mcQuestion}
                   onChange={(e) => setMcQuestion(e.target.value)}
                   className="w-full px-4 py-2 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                   rows={2}
-                  placeholder="Enter your question..."
+                  placeholder="Digite sua questão..."
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-emerald-800 mb-2">
-                  Choices (check correct answers)
+                  Opções (marque as respostas corretas)
                 </label>
                 {choices.map((choice, i) => (
                   <div key={i} className="flex gap-2 mb-2">
@@ -795,7 +795,7 @@ function EditQuestionModal({ question, onClose }: { question: any; onClose: () =
                         newChoices[i] = e.target.value;
                         setChoices(newChoices);
                       }}
-                      placeholder={`Choice ${i + 1}`}
+                      placeholder={`Opção ${i + 1}`}
                       className="flex-1 px-4 py-2 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                     />
                     {choices.length > 2 && (
@@ -817,7 +817,7 @@ function EditQuestionModal({ question, onClose }: { question: any; onClose: () =
                   onClick={() => setChoices([...choices, ""])}
                   className="text-emerald-600 hover:text-emerald-700 font-semibold text-sm"
                 >
-                  + Add Choice
+                  + Adicionar Opção
                 </button>
               </div>
             </div>
@@ -826,17 +826,17 @@ function EditQuestionModal({ question, onClose }: { question: any; onClose: () =
           {question.type === "free_text" && (
             <div>
               <label className="block text-sm font-medium text-emerald-800 mb-1">
-                Question Prompt
+                Enunciado da Questão
               </label>
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 className="w-full px-4 py-2 border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
                 rows={4}
-                placeholder="Enter your question prompt..."
+                placeholder="Digite o enunciado da sua questão..."
               />
               <p className="text-sm text-emerald-600 mt-1">
-                Student answers will be evaluated by AI
+                As respostas dos alunos serão avaliadas por IA
               </p>
             </div>
           )}
@@ -846,14 +846,14 @@ function EditQuestionModal({ question, onClose }: { question: any; onClose: () =
               type="submit"
               className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
             >
-              Save Changes
+              Salvar Alterações
             </button>
             <button
               type="button"
               onClick={onClose}
               className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
             >
-              Cancel
+              Cancelar
             </button>
           </div>
         </form>
