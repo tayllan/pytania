@@ -27,7 +27,7 @@ export function PlaySession({
   // Timer logic
   useEffect(() => {
     if (!session || session.completed) return;
-    
+
     if (session.mode === "exam" && session.timeLimit) {
       const elapsed = Date.now() - session.startTime;
       const remaining = Math.max(0, session.timeLimit * 1000 - elapsed);
@@ -83,11 +83,11 @@ export function PlaySession({
       <div className="bg-white rounded-xl p-6 shadow-lg border border-emerald-100 mb-6">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-4">
-            <span className="text-emerald-700 font-bold">
-              Question {currentQuestionIndex + 1} of {questions.length}
+            <span className="text-purple-700 font-bold">
+              Questão {currentQuestionIndex + 1} de {questions.length}
             </span>
             <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-semibold">
-              {session.mode === "exam" ? "Exam Mode" : "Practice Mode"}
+              {session.mode === "exam" ? "Modo de Exame" : "Modo de Prática"}
             </span>
           </div>
           {timeRemaining !== null && (
@@ -156,24 +156,24 @@ export function PlaySession({
         <button
           onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
           disabled={currentQuestionIndex === 0}
-          className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-3 bg-orange-300 text-gray-700 rounded-lg font-semibold hover:bg-orange-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          ← Previous
+          ← Anterior
         </button>
-        
+
         {currentQuestionIndex === questions.length - 1 ? (
           <button
             onClick={handleComplete}
-            className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
+            className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors"
           >
-            Finish
+            Finalizar
           </button>
         ) : (
           <button
             onClick={() => setCurrentQuestionIndex(Math.min(questions.length - 1, currentQuestionIndex + 1))}
-            className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
+            className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors"
           >
-            Next →
+            Próxima →
           </button>
         )}
       </div>
@@ -245,13 +245,13 @@ function MatchQuestion({
 
   return (
     <div>
-      <h3 className="text-xl font-bold text-emerald-900 mb-4">Match the questions with their answers</h3>
-      {!submitted && <p className="text-emerald-700 mb-4">Click a question, then click its matching answer</p>}
+      <h3 className="text-xl font-bold text-emerald-900 mb-4">Relacione as questões com suas respostas</h3>
+      {!submitted && <p className="text-gray-600 mb-4">Clique em uma questão e depois na resposta correspondente</p>}
 
       {!submitted || !isPracticeMode ? (
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-3">
-            <h4 className="font-semibold text-emerald-800 mb-2">Questions</h4>
+            <h4 className="font-semibold text-purple-800 mb-2">Questões</h4>
             {shuffledQuestions.map((item, i) => {
               const matchedAnswerIdx = matches[i];
               return (
@@ -291,7 +291,7 @@ function MatchQuestion({
           </div>
 
           <div className="space-y-3">
-            <h4 className="font-semibold text-emerald-800 mb-2">Answers</h4>
+            <h4 className="font-semibold text-purple-800 mb-2">Respostas</h4>
             {shuffledAnswers.map((item, i) => (
               <button
                 key={i}
@@ -354,8 +354,8 @@ function MatchQuestion({
                       <div className="text-sm text-green-700">→ {shuffledAnswers[matchedAnswerIdx].answer}</div>
                     ) : (
                       <div className="text-xs space-y-1">
-                        <div className="text-red-700">Your answer: {shuffledAnswers[matchedAnswerIdx].answer}</div>
-                        <div className="text-green-700">Correct: {shuffledAnswers[correctAnswerIdx].answer}</div>
+                        <div className="text-red-700">Sua resposta: {shuffledAnswers[matchedAnswerIdx].answer}</div>
+                        <div className="text-green-700">Correto: {shuffledAnswers[correctAnswerIdx].answer}</div>
                       </div>
                     )}
                   </div>
@@ -370,9 +370,9 @@ function MatchQuestion({
         <button
           onClick={handleSubmit}
           disabled={Object.keys(matches).length !== shuffledQuestions.length}
-          className="mt-6 px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-6 px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Submit Answer
+          Enviar Resposta
         </button>
       )}
     </div>
@@ -413,7 +413,7 @@ function MultipleChoiceQuestion({
   return (
     <div>
       <h3 className="text-xl font-bold text-emerald-900 mb-6">{question.question}</h3>
-      
+
       <div className="space-y-3">
         {question.choices?.map((choice: string, i: number) => {
           const isSelected = selected.includes(i);
@@ -447,7 +447,7 @@ function MultipleChoiceQuestion({
                 </div>
                 <span className="text-emerald-900">{choice}</span>
                 {showFeedback && isCorrect && (
-                  <span className="ml-auto text-green-600 font-semibold">✓ Correct</span>
+                  <span className="ml-auto text-green-600 font-semibold">✓ Correto</span>
                 )}
               </div>
             </button>
@@ -459,9 +459,9 @@ function MultipleChoiceQuestion({
         <button
           onClick={handleSubmit}
           disabled={selected.length === 0}
-          className="mt-6 px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-6 px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Submit Answer
+          Enviar Resposta
         </button>
       )}
     </div>
@@ -508,45 +508,45 @@ function FreeTextQuestion({
   return (
     <div>
       <h3 className="text-xl font-bold text-emerald-900 mb-6">{question.prompt}</h3>
-      
+
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
         disabled={submitted}
-        className="w-full px-4 py-3 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:bg-gray-100"
+        className="w-full px-4 py-3 border-2 border-orange-300 rounded-lg focus:ring-2 focus:ring-accent-600 focus:border-transparent disabled:bg-orange-100"
         rows={6}
-        placeholder="Type your answer here..."
+        placeholder="Digite sua resposta aqui..."
       />
 
       {!submitted && (
         <button
           onClick={handleSubmit}
           disabled={!text.trim()}
-          className="mt-4 px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-4 px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Submit Answer
+          Enviar Resposta
         </button>
       )}
 
       {evaluating && isPracticeMode && (
         <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-center gap-2">
-            <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
-            <span className="text-blue-800">Evaluating your answer...</span>
+            <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-200 border-t-transparent"></div>
+            <span className="text-blue-800">Avaliando sua resposta...</span>
           </div>
         </div>
       )}
 
       {submitted && !isPracticeMode && !evaluating && (
         <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <div className="text-blue-900">✓ Answer submitted. Feedback will be available after completing the exam.</div>
+          <div className="text-blue-800">✓ Resposta enviada. O feedback estará disponível após completar o exame.</div>
         </div>
       )}
 
       {submitted && isPracticeMode && answer?.llmFeedback && (
-        <div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+        <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
           <div className="font-semibold text-emerald-900 mb-2">Feedback:</div>
-          <div className="text-emerald-800">{answer.llmFeedback}</div>
+          <div className="text-gray-700">{answer.llmFeedback}</div>
         </div>
       )}
     </div>
@@ -572,20 +572,20 @@ function Results({ questions, answers, onEnd }: any) {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-white rounded-xl p-8 shadow-lg border border-emerald-100 mb-6">
-        <h2 className="text-3xl font-bold text-emerald-900 mb-6 text-center">Session Complete!</h2>
+        <h2 className="text-3xl font-bold text-emerald-900 mb-6 text-center">Sessão Completa!</h2>
 
         <div className="grid grid-cols-3 gap-6 mb-8">
-          <div className="text-center p-6 bg-emerald-50 rounded-lg">
-            <div className="text-4xl font-bold text-emerald-700">{answeredQuestions}</div>
-            <div className="text-emerald-600 mt-1">Answered</div>
+          <div className="text-center p-6 bg-purple-50 rounded-lg">
+            <div className="text-4xl font-bold text-purple-700">{answeredQuestions}</div>
+            <div className="text-purple-600 mt-1">Respondidas</div>
           </div>
           <div className="text-center p-6 bg-green-50 rounded-lg">
             <div className="text-4xl font-bold text-green-700">{correctAnswers}</div>
-            <div className="text-green-600 mt-1">Correct</div>
+            <div className="text-green-700 mt-1">Corretas</div>
           </div>
-          <div className="text-center p-6 bg-cyan-50 rounded-lg">
-            <div className="text-4xl font-bold text-cyan-700">{percentage}%</div>
-            <div className="text-cyan-600 mt-1">Score</div>
+          <div className="text-center p-6 bg-blue-50 rounded-lg">
+            <div className="text-4xl font-bold text-blue-800">{percentage}%</div>
+            <div className="text-blue-800 mt-1">Pontuação</div>
           </div>
         </div>
 
@@ -612,14 +612,14 @@ function Results({ questions, answers, onEnd }: any) {
                   className="w-full p-4 flex items-center gap-3 text-left hover:opacity-80 transition-opacity"
                 >
                   <span className="font-bold text-emerald-900">#{i + 1}</span>
-                  <span className="px-2 py-1 bg-white rounded text-xs font-semibold">
-                    {question.type === "match" && "Match"}
-                    {question.type === "multiple_choice" && "MC"}
-                    {question.type === "free_text" && "Free"}
+                  <span className="px-2 py-1 bg-orange-50 rounded text-xs font-semibold">
+                    {question.type === "match" && "Relacionar"}
+                    {question.type === "multiple_choice" && "ME"}
+                    {question.type === "free_text" && "Livre"}
                   </span>
-                  {!answer && <span className="ml-auto text-gray-600 text-sm">Not answered</span>}
-                  {answer?.isCorrect === true && <span className="ml-auto text-green-600 font-semibold text-sm">✓ Correct</span>}
-                  {answer?.isCorrect === false && <span className="ml-auto text-red-600 font-semibold text-sm">✗ Incorrect</span>}
+                  {!answer && <span className="ml-auto text-gray-600 text-sm">Não respondida</span>}
+                  {answer?.isCorrect === true && <span className="ml-auto text-green-700 font-semibold text-sm">✓ Correto</span>}
+                  {answer?.isCorrect === false && <span className="ml-auto text-red-700 font-semibold text-sm">✗ Incorreto</span>}
                   <span className="text-emerald-600 text-xl ml-2">{isExpanded ? "−" : "+"}</span>
                 </button>
 
@@ -628,7 +628,7 @@ function Results({ questions, answers, onEnd }: any) {
                     {/* Match Question Details */}
                     {question.type === "match" && (
                       <div className="space-y-2 mt-3">
-                        <div className="text-sm font-semibold text-emerald-900 mb-2">Correct Pairs:</div>
+                        <div className="text-sm font-semibold text-emerald-900 mb-2">Pares Corretos:</div>
                         {question.matchPairs?.map((pair: any, idx: number) => (
                           <div key={idx} className="text-sm flex gap-2 items-start">
                             <span className="text-emerald-900">{pair.question}</span>
@@ -672,19 +672,19 @@ function Results({ questions, answers, onEnd }: any) {
                     {question.type === "free_text" && (
                       <div className="mt-3 space-y-3">
                         <div>
-                          <div className="text-sm font-semibold text-emerald-900 mb-1">Question:</div>
-                          <div className="text-sm text-emerald-800">{question.prompt}</div>
+                          <div className="text-sm font-semibold text-emerald-900 mb-1">Questão:</div>
+                          <div className="text-sm text-gray-700">{question.prompt}</div>
                         </div>
                         {answer?.textAnswer && (
                           <div>
-                            <div className="text-sm font-semibold text-emerald-900 mb-1">Your answer:</div>
-                            <div className="text-sm text-emerald-800">{answer.textAnswer}</div>
+                            <div className="text-sm font-semibold text-emerald-900 mb-1">Sua resposta:</div>
+                            <div className="text-sm text-gray-700">{answer.textAnswer}</div>
                           </div>
                         )}
                         {answer?.llmFeedback && (
                           <div>
                             <div className="text-sm font-semibold text-emerald-900 mb-1">Feedback:</div>
-                            <div className="text-sm text-emerald-800 italic">{answer.llmFeedback}</div>
+                            <div className="text-sm text-gray-700 italic">{answer.llmFeedback}</div>
                           </div>
                         )}
                       </div>
@@ -698,9 +698,9 @@ function Results({ questions, answers, onEnd }: any) {
 
         <button
           onClick={onEnd}
-          className="w-full mt-8 px-6 py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors"
+          className="w-full mt-8 px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors"
         >
-          Back to Deck
+          Voltar ao Deck
         </button>
       </div>
     </div>

@@ -43,7 +43,7 @@ export default function App() {
           className="flex items-center gap-3 hover:opacity-70 transition-opacity cursor-pointer"
         >
           <div className="text-2xl">🩺</div>
-          <h2 className="text-xl font-bold text-emerald-800">VetStudy</h2>
+          <h2 className="text-xl font-bold text-emerald-800">Pytania</h2>
         </button>
         <SignOutButton />
       </header>
@@ -114,9 +114,9 @@ function Content({
         <div className="max-w-md mx-auto mt-20">
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">🩺</div>
-            <h1 className="text-4xl font-bold text-emerald-800 mb-2">VetStudy</h1>
+            <h1 className="text-4xl font-bold text-emerald-800 mb-2">Pytania</h1>
             <p className="text-lg text-emerald-700">
-              Master veterinary medicine with interactive study decks
+              Domine a medicina veterinária com decks de estudo interativos
             </p>
           </div>
           <SignInForm />
